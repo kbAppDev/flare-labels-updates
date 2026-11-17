@@ -1,0 +1,83 @@
+name: Release Flare Labels
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Project version to build'
+        required: true
+        type: string
+      publish:
+        description: 'Publish as a stable release'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: flare-labels-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Set up .NET
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73
+        with:
+          dotnet-version: '10.0.x'
+      - name: Resolve release version
+        shell: pwsh
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { $env:INPUT_VERSION }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid release version' }
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+      - name: Build, test and package
+        shell: pwsh
+        run: .\scripts\Build.ps1 -Version $env:RELEASE_VERSION
+      - name: Sign and verify update metadata
+        shell: pwsh
+        env:
+          FLARE_LABELS_SIGNING_PRIVATE_KEY: ${{ secrets.FLARE_LABELS_SIGNING_PRIVATE_KEY }}
+        run: .\scripts\Sign-Release.ps1 -Version $env:RELEASE_VERSION
+      - name: Publish verified release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_REQUESTED: ${{ inputs.publish }}
+        run: |
+          $version = $env:RELEASE_VERSION
+          $tag = "v$version"
+          $release = Join-Path $PWD "dist/v$version"
+          $assets = @(
+            (Join-Path $release "Flare-Labels-Setup-$version.exe"),
+            (Join-Path $release "Flare-Labels-$version-portable.zip"),
+            (Join-Path $release 'flare-labels-update.json')
+          )
+          $notes = @"
+          Flare Fireplaces mailing labels for Windows.
+          
+          Import Excel or CSV, review contacts, and export Word labels centered horizontally and vertically.
+          Includes verified GitHub updates, editable contact details, duplicate review and partially used sheets.
+          
+          Install the setup EXE for normal team use. The portable ZIP is a runnable backup.
+          "@
+          $notesFile = Join-Path $release 'release-notes.md'
+          [IO.File]::WriteAllText($notesFile, $notes)
+          $existing = & gh release view $tag --repo $env:GITHUB_REPOSITORY --json isDraft 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $info = $existing | ConvertFrom-Json
+            if (-not $info.isDraft) { throw 'A published release already exists; use a new version.' }
+            & gh release upload $tag @assets --repo $env:GITHUB_REPOSITORY --clobber
+          } else {
+            & gh release create $tag @assets --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --title "Flare Labels $version" --notes-file $notesFile
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'Release upload failed' }
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -or $env:PUBLISH_REQUESTED -eq 'true') {
+            & gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest
+            if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }
+          }
+

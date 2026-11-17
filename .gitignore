@@ -1,0 +1,12 @@
+bin/
+obj/
+dist/
+.vs/
+*.user
+*.suo
+self-test-error.txt
+release-tool-error.txt
+Installer/payload.zip
+*private*.pem
+*.download
+tests/artifacts/

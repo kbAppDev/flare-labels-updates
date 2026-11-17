@@ -1,0 +1,42 @@
+FLARE LABELS 1.0.2
+Flare Fireplaces
+
+1. Import an .xlsx, .xlsm or .csv contact file. You can also drop it on the app.
+2. Choose the correct worksheet. Use Match columns if needed.
+3. Review contacts. Double-click a row to edit. Uncheck any label you don't need.
+4. Review duplicate warnings. Nothing is combined or removed automatically.
+5. Choose the starting label if your first sheet is partially used.
+6. Export Word document, then open the saved .docx in Microsoft Word.
+
+PRINTING
+Use the same 4 x 2-inch, 10-per-sheet label stock as the supplied template.
+Paper: US Letter (8.5 x 11 inches). Print single sided, one page per sheet,
+at 100% scale. Test on plain paper first. If the entire sheet shifts, use
+Print settings to adjust horizontal and vertical alignment.
+
+LABEL RULES
+Company name, then first and last name if BOTH are present, then address.
+If only a first or last name is present, only the company name is used.
+When a company is missing, a complete personal name can be used instead.
+All content is centered horizontally and vertically inside each label.
+Long labels wrap and reduce font size only when needed, to a minimum of 10pt.
+Incomplete selected addresses must be fixed or unchecked before export.
+Email addresses and phone numbers are never included on labels.
+
+FILES AND PRIVACY
+The app runs locally with no login, subscriptions or contact uploads.
+GitHub is used only to check and download app updates.
+Importing never changes your source spreadsheet. Font and printer alignment
+preferences are remembered. Imported contact lists are not retained after
+closing the app; your saved Word documents remain where you saved them.
+Older .xls workbooks should first be saved as .xlsx in Excel.
+
+INSTALL / REMOVE
+Run Flare-Labels-Setup.exe for each coworker. No separate .NET download is needed.
+To remove the app, use Windows Settings > Apps > Installed apps > Flare Labels.
+Your source spreadsheets and Word documents are kept.
+
+UPDATES
+The app checks for verified updates when it opens, at most once a day.
+Use Check for updates to check manually. Installation happens only when you
+choose it, and closes the current contact list, so export your labels first.

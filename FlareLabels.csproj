@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>FlareLabels</AssemblyName>
+    <RootNamespace>FlareLabels</RootNamespace>
+    <Version>1.0.2</Version>
+    <Company>Flare Fireplaces</Company>
+    <Product>Flare Labels</Product>
+    <Description>Centered mailing labels from Excel to Word</Description>
+    <ApplicationIcon>Assets/Flare-Labels.ico</ApplicationIcon>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeFrameworkVersion>10.0.11</RuntimeFrameworkVersion>
+    <TargetLatestRuntimePatch>false</TargetLatestRuntimePatch>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>none</DebugType>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DefaultItemExcludes>$(DefaultItemExcludes);dist/**</DefaultItemExcludes>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Installer/**/*.cs" />
+    <Resource Include="Assets/Flare-Labels.png" />
+    <Resource Include="Assets/Flare-Labels.ico" />
+    <EmbeddedResource Include="Assets/Label-Template.docx" />
+    <EmbeddedResource Include="Assets/Update-Public-Key.pem" />
+  </ItemGroup>
+</Project>
