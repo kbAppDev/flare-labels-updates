@@ -40,3 +40,13 @@ UPDATES
 The app checks for verified updates when it opens, at most once a day.
 Use Check for updates to check manually. Installation happens only when you
 choose it, and closes the current contact list, so export your labels first.
+
+FLARE TOOLS
+Black, red and lime. One consistent family of Flare Fireplaces tools.
+
+SHORTCUTS
+Ctrl+O: Import Excel
+Ctrl+F: Search contacts
+Ctrl+E: Save Word labels
+Escape in search: Clear search and filters
+Click a label preview to select the contact. Double-click to edit it.

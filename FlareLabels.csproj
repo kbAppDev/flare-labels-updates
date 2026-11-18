@@ -7,9 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>FlareLabels</AssemblyName>
     <RootNamespace>FlareLabels</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
     <Company>Flare Fireplaces</Company>
-    <Product>Flare Labels</Product>
+    <Product>Flare Tools · Labels</Product>
     <Description>Centered mailing labels from Excel to Word</Description>
     <ApplicationIcon>Assets/Flare-Labels.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

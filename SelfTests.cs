@@ -13,21 +13,40 @@ public static class SelfTests
     {
         int at=Array.IndexOf(args,"--self-test");string input=args[at+1];string output=args[at+2];Directory.CreateDirectory(output);
         var checks=new List<string>();
-        void Check(bool condition,string description){if(!condition)throw new InvalidOperationException(description);checks.Add(description);}
+        void Check(bool condition,string description){if(!condition)throw new InvalidOperationException(description);checks.Add(description);Console.WriteLine(description);}
         System.Windows.Application.Current.ShutdownMode=System.Windows.ShutdownMode.OnExplicitShutdown;
-        var window=new MainWindow();
-        Check(window.Title=="Flare Labels","Loads the complete desktop interface and packaged icon");
+        Console.WriteLine("Constructing interface");var window=new MainWindow(true);
+        Check(window.Title=="Flare Tools · Labels","Loads the Flare Tools shell and packaged icon");
+        void Render(System.Windows.Window target,string name,int width,int height)
+        {
+            var surface=(System.Windows.FrameworkElement)target.Content;
+            surface.Measure(new System.Windows.Size(width,height));surface.Arrange(new System.Windows.Rect(0,0,width,height));surface.UpdateLayout();
+            var bitmap=new System.Windows.Media.Imaging.RenderTargetBitmap(width,height,96,96,System.Windows.Media.PixelFormats.Pbgra32);bitmap.Render(surface);
+            var encoder=new System.Windows.Media.Imaging.PngBitmapEncoder();encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using var image=new MemoryStream();encoder.Save(image);File.WriteAllBytes(Path.Combine(output,name),image.ToArray());
+        }
+        Render(window,"interface-empty.png",1400,900);
         window.LoadDemo();
-        var surface=(System.Windows.FrameworkElement)window.Content;
-        surface.Measure(new System.Windows.Size(1400,900));
-        surface.Arrange(new System.Windows.Rect(0,0,1400,900));surface.UpdateLayout();
-        var bitmap=new System.Windows.Media.Imaging.RenderTargetBitmap(1400,900,96,96,System.Windows.Media.PixelFormats.Pbgra32);
-        bitmap.Render(surface);
-        var encoder=new System.Windows.Media.Imaging.PngBitmapEncoder();encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
-        using(var image=File.Create(Path.Combine(output,"interface-review.png")))encoder.Save(image);
+        Render(window,"interface-review.png",1400,900);
+        Render(window,"interface-compact.png",1100,740);
         var export=(System.Windows.Controls.Button)window.FindName("ExportButton");
-        Check(export.IsEnabled&&export.Foreground is System.Windows.Media.SolidColorBrush b&&b.Color==System.Windows.Media.Colors.White,"Export action remains readable with white text on the active button");
+        Check(export.IsEnabled&&export.Foreground is System.Windows.Media.SolidColorBrush b&&b.Color==System.Windows.Media.Color.FromRgb(21,26,10)&&export.Background is System.Windows.Media.SolidColorBrush bg&&bg.Color==System.Windows.Media.Color.FromRgb(153,204,0),"Uses readable charcoal text on the exact Flare lime primary action");
+        var previous=(System.Windows.Controls.Button)window.FindName("PreviousButton");var next=(System.Windows.Controls.Button)window.FindName("NextButton");
+        Check(!previous.IsEnabled&&!next.IsEnabled,"Disables sheet arrows when the batch fits on one sheet");
         var book=SpreadsheetReader.Read(input);var sheet=book.Sheets[0];var map=SpreadsheetReader.Detect(sheet);var contacts=SpreadsheetReader.Contacts(sheet,map);
+        var search=(System.Windows.Controls.TextBox)window.FindName("SearchBox");search.Text="Unmatched search";
+        Check(((System.Windows.Controls.Border)window.FindName("NoResults")).Visibility==System.Windows.Visibility.Visible,"Shows a clear empty-search state");
+        Check(window.TryUseWorkbook(book,0),"Commits a fully prepared workbook");
+        Check(search.Text.Length==0&&((System.Windows.Controls.DataGrid)window.FindName("ContactsGrid")).Items.Count==20,"Clears stale filters when a new spreadsheet is imported");
+        var title=(System.Windows.Controls.TextBlock)window.FindName("FileTitle");string originalTitle=title.Text;
+        var canceled=new WorkbookData("Canceled.xlsx",[new SheetData("Incomplete",[["Unknown header"],["Value"]])]);
+        Check(!window.TryUseWorkbook(canceled,0,(_,_)=>null)&&title.Text==originalTitle&&((System.Windows.Controls.DataGrid)window.FindName("ContactsGrid")).Items.Count==20,"Canceling column mapping preserves the entire active session");
+        var grid=(System.Windows.Controls.DataGrid)window.FindName("ContactsGrid");grid.SelectedItem=grid.Items[19];
+        Check(previous.IsEnabled&&!next.IsEnabled&&((System.Windows.Controls.TextBlock)window.FindName("PageText")).Text=="Page 2 of 2","Selecting a contact navigates to its matching preview sheet");
+        var editor=new ContactDialog(contacts[0]);Render(editor,"interface-edit-label.png",620,760);editor.Close();
+        var mapper=new MappingDialog(sheet,map);Render(mapper,"interface-match-columns.png",590,780);mapper.Close();
+        var settings=new PrintSettingsDialog(new());Render(settings,"interface-settings.png",540,700);settings.Close();
+        var choice=new ChoiceDialog("Review possible duplicates","Some selected labels share a company and mailing address. Keep every selected label, or check the duplicate contacts first.","Keep all & save","Review duplicates");Render(choice,"interface-review-duplicates.png",560,310);choice.Close();
         Check(map.HeaderRow==1,"Detects title row before spreadsheet headers");
         Check(contacts.Count==20,"Imports all 20 source contacts without blank rows");
         Check(contacts.All(c=>c.IsValid),"All 20 source addresses are complete");

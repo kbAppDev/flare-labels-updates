@@ -139,25 +139,26 @@ internal static class SetupProgram
 
 internal sealed class SetupWindow : Form
 {
-    readonly Button install=new Button();readonly CheckBox desktop=new CheckBox();readonly ProgressBar progress=new ProgressBar();readonly Label status=new Label();readonly bool updateMode;bool complete,busy;
+    readonly Button install=new RoundedButton();readonly CheckBox desktop=new CheckBox();readonly ProgressBar progress=new ProgressBar();readonly Label status=new Label();readonly bool updateMode;bool complete,busy;
     public SetupWindow(bool updating)
     {
         updateMode=updating;
-        Text="Flare Labels Setup";ClientSize=new Size(540,550);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;BackColor=Color.FromArgb(20,29,40);ForeColor=Color.White;Font=new Font("Segoe UI",10);Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-        var logo=new PictureBox{Bounds=new Rectangle(34,30,86,86),SizeMode=PictureBoxSizeMode.Zoom};
+        Text="Flare Tools · Labels Setup";ClientSize=new Size(560,560);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;BackColor=Color.FromArgb(246,248,241);ForeColor=Color.FromArgb(32,36,30);Font=new Font("Segoe UI",10);Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+        var logo=new PictureBox{Bounds=new Rectangle(34,30,84,84),SizeMode=PictureBoxSizeMode.Zoom,BackColor=Color.Transparent};
         using(var image=Assembly.GetExecutingAssembly().GetManifestResourceStream("FlareLabels.Logo")){if(image!=null){using(var bitmap=new Bitmap(image))logo.Image=new Bitmap(bitmap);}}Controls.Add(logo);
-        AddLabel("FLARE FIREPLACES",new Rectangle(140,45,350,22),10,Color.FromArgb(180,195,213),FontStyle.Bold);
-        AddLabel("Flare Labels",new Rectangle(137,70,360,45),26,Color.White,FontStyle.Bold);
-        AddLabel("Excel contacts. Centered Word labels.",new Rectangle(35,143,465,32),15,Color.White,FontStyle.Regular);
-        AddLabel("• Import Excel and match your address columns\n• Review missing details and possible duplicates\n• Export centered 4 × 2-inch mailing labels\n• Works offline without a login",new Rectangle(35,193,475,116),11,Color.FromArgb(187,199,214),FontStyle.Regular);
-        AddLabel("Installs for your Windows account",new Rectangle(35,326,470,24),10,Color.FromArgb(187,199,214),FontStyle.Regular);
-        AddLabel(SetupProgram.InstallPath,new Rectangle(35,352,470,36),9,Color.FromArgb(180,195,213),FontStyle.Regular);
-        desktop.Text="Add a desktop shortcut";desktop.Checked=!updating||File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),"Flare Labels.lnk"));desktop.SetBounds(35,401,460,25);desktop.ForeColor=Color.FromArgb(214,223,234);Controls.Add(desktop);
-        progress.SetBounds(35,440,470,7);progress.Style=ProgressBarStyle.Continuous;progress.Visible=false;Controls.Add(progress);
-        status.SetBounds(35,460,290,52);status.ForeColor=Color.FromArgb(180,195,213);status.Font=new Font("Segoe UI",9);status.Text="Version "+SetupProgram.ReleaseVersion+" · Windows 10 / 11 (64-bit)";Controls.Add(status);
-        install.Text="Install Flare Labels";install.SetBounds(336,469,170,43);install.BackColor=Color.FromArgb(196,65,20);install.ForeColor=Color.White;install.FlatStyle=FlatStyle.Flat;install.FlatAppearance.BorderSize=0;install.Cursor=Cursors.Hand;install.Click+=InstallClick;Controls.Add(install);
+        AddLabel("FLARE TOOLS",new Rectangle(140,43,360,24),11,Color.FromArgb(183,26,38),FontStyle.Bold);
+        AddLabel("Labels",new Rectangle(137,69,360,48),28,ForeColor,FontStyle.Bold);
+        AddLabel("A simpler way to send something.",new Rectangle(35,146,495,32),17,ForeColor,FontStyle.Regular);
+        AddLabel("Import Excel and match your address columns\nReview your contacts and mailing addresses\nSave perfectly centered Word labels\nWorks offline, without a login",new Rectangle(35,196,485,122),11,Color.FromArgb(81,91,70),FontStyle.Regular);
+        AddLabel("Installs for your Windows account",new Rectangle(35,332,490,24),10,Color.FromArgb(81,91,70),FontStyle.Regular);
+        AddLabel(SetupProgram.InstallPath,new Rectangle(35,360,490,36),9,Color.FromArgb(81,91,70),FontStyle.Regular);
+        desktop.Text="Add a desktop shortcut";desktop.Checked=!updating||File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),"Flare Labels.lnk"));desktop.SetBounds(35,407,485,25);desktop.ForeColor=ForeColor;Controls.Add(desktop);
+        progress.SetBounds(35,447,490,7);progress.Style=ProgressBarStyle.Continuous;progress.Visible=false;Controls.Add(progress);
+        status.SetBounds(35,474,280,52);status.ForeColor=Color.FromArgb(81,91,70);status.Font=new Font("Segoe UI",9);status.Text="Version "+SetupProgram.ReleaseVersion+" · Windows 10 / 11 (64-bit)";Controls.Add(status);
+        install.Text="Install Labels";install.SetBounds(345,478,180,44);install.BackColor=Color.FromArgb(153,204,0);install.ForeColor=Color.FromArgb(21,26,10);install.FlatStyle=FlatStyle.Flat;install.FlatAppearance.BorderSize=0;install.Cursor=Cursors.Hand;install.Click+=InstallClick;Controls.Add(install);
         FormClosing+=(s,e)=>{if(busy)e.Cancel=true;};
         if(updating)Shown+=(s,e)=>InstallClick(s,e);
+
     }
     void AddLabel(string text,Rectangle bounds,float size,Color color,FontStyle style){Controls.Add(new Label{Text=text,Bounds=bounds,Font=new Font("Segoe UI",size,style),ForeColor=color,BackColor=Color.Transparent});}
     async void InstallClick(object sender,EventArgs e)
@@ -174,4 +175,24 @@ internal sealed class SetupWindow : Form
         finally{busy=false;install.Enabled=true;desktop.Enabled=true;}
         if(complete&&updateMode){Process.Start(Path.Combine(SetupProgram.InstallPath,SetupProgram.AppExe));Close();}
     }
+}
+
+internal sealed class RoundedButton : Button
+{
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        e.Graphics.SmoothingMode=System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        var rect=new Rectangle(0,0,Width-1,Height-1);int radius=18,diameter=radius*2;
+        using(var path=new System.Drawing.Drawing2D.GraphicsPath())
+        {
+            path.AddArc(rect.Left,rect.Top,diameter,diameter,180,90);path.AddArc(rect.Right-diameter,rect.Top,diameter,diameter,270,90);
+            path.AddArc(rect.Right-diameter,rect.Bottom-diameter,diameter,diameter,0,90);path.AddArc(rect.Left,rect.Bottom-diameter,diameter,diameter,90,90);path.CloseFigure();
+            Color fill=!Enabled?Color.FromArgb(226,231,217):ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position))?Color.FromArgb(171,220,34):BackColor;
+            using(var brush=new SolidBrush(fill))e.Graphics.FillPath(brush,path);
+            if(Focused){using(var pen=new Pen(ForeColor,2))e.Graphics.DrawPath(pen,path);}
+        }
+        TextRenderer.DrawText(e.Graphics,Text,Font,ClientRectangle,Enabled?ForeColor:Color.FromArgb(93,100,89),TextFormatFlags.HorizontalCenter|TextFormatFlags.VerticalCenter);
+    }
+    protected override void OnMouseEnter(EventArgs e){base.OnMouseEnter(e);Invalidate();}
+    protected override void OnMouseLeave(EventArgs e){base.OnMouseLeave(e);Invalidate();}
 }

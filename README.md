@@ -1,6 +1,6 @@
-# Flare Labels
+# Flare Tools · Labels
 
-Flare Fireplaces Windows app for turning Excel contacts into centered, printable Word address labels.
+The Flare Tools Windows app from Flare Fireplaces for turning Excel contacts into centered, printable Word address labels.
 
 Import an `.xlsx`, `.xlsm` or `.csv` file, review contacts, and export a `.docx` using the supplied 4 × 2-inch template: two columns, five rows, US Letter paper. Every address block is centered horizontally and vertically.
 
@@ -35,3 +35,9 @@ Update the project version, commit the source, and push a matching tag such as `
 Contact files stay on the user's computer. GitHub checks send no contact or spreadsheet data. Imported contact lists are not retained after closing the app. Settings and verified update downloads live outside the installation under `%LOCALAPPDATA%\Flare Labels`; user-generated Word documents are saved only to the location the user selects.
 
 Source spreadsheets, generated labels, credentials, private keys, settings, logs and build output are excluded from Git. The test contacts are fictional. Microsoft .NET license and third-party notices are included with distributed app files.
+
+## Flare Tools design
+
+Version 1.1.0 introduces the shared black, red and lime (#99CC00) foundation, softer surfaces, refined icons, consistent dialogs and direct review actions. See [the reusable design foundation](docs/Flare-Tools-Design.md). Other Flare applications can adopt this foundation in subsequent updates.
+
+Keyboard shortcuts: Ctrl+O imports, Ctrl+F searches, Ctrl+E saves labels, and Escape clears the active search. Click a label preview to select its contact; double-click to edit.

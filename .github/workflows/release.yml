@@ -57,16 +57,7 @@ jobs:
             (Join-Path $release "Flare-Labels-$version-portable.zip"),
             (Join-Path $release 'flare-labels-update.json')
           )
-          $notes = @"
-          Flare Fireplaces mailing labels for Windows.
-          
-          Import Excel or CSV, review contacts, and export Word labels centered horizontally and vertically.
-          Includes verified GitHub updates, editable contact details, duplicate review and partially used sheets.
-          
-          Install the setup EXE for normal team use. The portable ZIP is a runnable backup.
-          "@
-          $notesFile = Join-Path $release 'release-notes.md'
-          [IO.File]::WriteAllText($notesFile, $notes)
+          $notesFile = Join-Path $PWD "RELEASE-NOTES.md"
           $existing = & gh release view $tag --repo $env:GITHUB_REPOSITORY --json isDraft 2>$null
           if ($LASTEXITCODE -eq 0) {
             $info = $existing | ConvertFrom-Json
